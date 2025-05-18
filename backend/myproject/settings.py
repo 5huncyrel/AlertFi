@@ -38,8 +38,14 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 CORS_ALLOWED_ORIGINS = [
-    "https://alertfi-web-1a01c.web.app",
+    "https://alertfi-web-f5b98.web.app",
 ]
+
+# For WebSocket CORS (if using custom middleware)
+CSRF_TRUSTED_ORIGINS = [
+    "https://alertfi-web-f5b98.web.app",
+]
+
 
 # Application definition
 
