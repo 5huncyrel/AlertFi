@@ -10,7 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import authenticate
 from .models import AlertLog
 from .serializers import AlertLogSerializer
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListCreateAPIView
 
 class RegisterView(APIView):
     def post(self, request):
@@ -44,9 +44,14 @@ class ProtectedView(APIView):
         return Response({"message": f"Welcome {request.user.username}, you're authenticated!"})
 
 
-class AlertLogListView(ListAPIView):
+
+
+class AlertLogListCreateView(ListCreateAPIView):
     serializer_class = AlertLogSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return AlertLog.objects.filter(user=self.request.user).order_by('-timestamp')
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
