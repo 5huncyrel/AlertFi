@@ -1,0 +1,132 @@
+#include <WiFi.h>
+#include <WiFiClientSecure.h> // ✅ Required for HTTPS
+#include <HTTPClient.h>
+#include <ArduinoJson.h>
+
+// 🔧 Define pins and threshold
+#define MQ2_PIN 34
+#define BUZZER_PIN 26
+int danger_threshold = 400;
+int warning_threshold = 300;
+
+// 🔐 Wi-Fi credentials
+const char* ssid = "ZTE_2.4G_ZZXXct";
+const char* password = "SxxQc4ES";
+
+// 🌐 Render Django backend
+const char* backend_host = "alertfi-web-7jgc.onrender.com";
+String jwt_token = "";
+
+// 🔐 Get JWT token from backend
+void getJWTToken() {
+  WiFiClientSecure client;
+  client.setInsecure(); // ✅ Disable SSL cert verification for Render
+
+  HTTPClient http;
+  String url = "https://" + String(backend_host) + "/api/token/";
+  http.begin(client, url);
+
+  http.addHeader("Content-Type", "application/json");
+
+  StaticJsonDocument<200> doc;
+  doc["username"] = "admin";
+  doc["password"] = "admin123";
+
+  String requestBody;
+  serializeJson(doc, requestBody);
+
+  int httpResponseCode = http.POST(requestBody);
+  Serial.printf("🔁 HTTP Response Code: %d\n", httpResponseCode);
+
+  if (httpResponseCode > 0) {
+    String response = http.getString();
+    Serial.println("[JWT] Response: " + response);
+
+    StaticJsonDocument<512> resDoc;
+    DeserializationError error = deserializeJson(resDoc, response);
+    if (!error) {
+      jwt_token = resDoc["access"].as<String>();
+      Serial.println("✅ Got JWT Token!");
+    } else {
+      Serial.println("❌ Failed to parse JWT response");
+    }
+  } else {
+    Serial.printf("❌ Token request failed. Code: %d\n", httpResponseCode);
+  }
+
+  http.end();
+}
+
+// 🚀 Setup function
+void setup() {
+  Serial.begin(115200);
+  delay(1000);
+
+  WiFi.begin(ssid, password);
+  Serial.print("📶 Connecting to Wi-Fi");
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("\n✅ Wi-Fi Connected!");
+  Serial.println(WiFi.localIP());
+
+  pinMode(MQ2_PIN, INPUT);
+  pinMode(BUZZER_PIN, OUTPUT);
+
+  getJWTToken(); // 🔐 Get token after Wi-Fi connects
+}
+
+// 🔁 Main loop
+void loop() {
+  static unsigned long lastSent = 0;
+  if (millis() - lastSent > 5000 && jwt_token != "") {
+    lastSent = millis();
+
+    int sensorValue = analogRead(MQ2_PIN);
+    String status = "SAFE";
+
+    if (sensorValue > danger_threshold) {
+      status = "DANGER";
+      digitalWrite(BUZZER_PIN, HIGH);
+    } else if (sensorValue >= warning_threshold) {
+      status = "WARNING";
+      digitalWrite(BUZZER_PIN, LOW);
+    } else {
+      digitalWrite(BUZZER_PIN, LOW);
+    }
+
+    WiFiClientSecure client;
+    client.setInsecure();
+
+    HTTPClient http;
+    String url = "https://" + String(backend_host) + "/api/alerts/";
+    http.begin(client, url);
+    http.addHeader("Content-Type", "application/json");
+    http.addHeader("Authorization", "Bearer " + jwt_token);
+
+    StaticJsonDocument<200> json;
+    json["message"] = "PPM: " + String(sensorValue);
+
+    if (status == "DANGER") {
+      json["alert_level"] = "danger";
+    } else if (status == "WARNING") {
+      json["alert_level"] = "warning";
+    } else {
+      json["alert_level"] = "safe";
+    }
+
+    String requestBody;
+    serializeJson(json, requestBody);
+
+    int httpResponseCode = http.POST(requestBody);
+    if (httpResponseCode > 0) {
+      Serial.printf("📤 Data sent! Code: %d\n", httpResponseCode);
+      Serial.println(http.getString());
+    } else {
+      Serial.printf("❌ Failed to send data. Code: %d\n", httpResponseCode);
+    }
+
+    http.end();
+  }
+}
