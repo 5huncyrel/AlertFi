@@ -1,8 +1,14 @@
 # 🚨 AlertFi: Fire Detection and Alert System
 
-*AlertFi* is a real-time fire risk detection system using an IoT-based ESP32 device with an MQ2 gas sensor.  
-It integrates with a Django REST backend and features a responsive ReactJS web dashboard and a Flutter mobile app.
+*AlertFi* is a real-time fire risk detection system using an IoT-based ESP32 device with an MQ2 sensor.  
+It integrates with a Django REST backend and features a responsive Vite + ReactJS web dashboard and a Flutter mobile app.
 
+---
+
+## 🌐 Live Deployment
+
+- *🔗 Frontend (Web Dashboard):* [https://alertfi-web-f5b98.web.app/](https://alertfi-web-f5b98.web.app/)
+- *🔗 Backend (Django API):* [https://alertfi-web-7jgc.onrender.com/](https://alertfi-web-7jgc.onrender.com/)
 ---
 
 ## 🧩 Features
@@ -15,6 +21,20 @@ It integrates with a Django REST backend and features a responsive ReactJS web d
 - ☁️ Fully deployed (Render + GitHub + Firebase/Expo)
 
 ---
+
+## 📬 API Endpoints
+
+| Endpoint                | Method   | Description                        |
+|------------------------|----------|------------------------------------|
+| /admin/              | GET      | Django admin dashboard             |
+| /api/register/       | POST     | User registration                  |
+| /api/login/          | POST     | User login                         |
+| /api/token/          | POST     | Get JWT access + refresh token     |
+| /api/token/refresh/  | POST     | Refresh access token               |
+| /api/protected/      | GET      | Auth-protected route (for testing) |
+| /api/alerts/         | GET/POST | Fetch or create gas alert logs     |
+| `/ws/sensor/?token=...`| WS       | WebSocket for live sensor data     |
+
 
 ## 🚀 How to Run
 
@@ -52,9 +72,11 @@ Login → receive token
 Send requests with Authorization: Bearer <token>
 
 
+
+
 ## Authors
 
-Shun Cyrel Caseres — Full Stack Developer (Frontend & Backend)
-Faith Gutierrez — Technical Writer
+Shun Cyrel Caseres — Frontend & Backend
+Faith Gutierrez — Technical Writer & Frontend
 Christine B. Sevilla — Frontend Developer
-Jayrille Tubera — IoT Developer (ESP32 + MQ2)
+Jayrille Tubera — IoT Developer 
