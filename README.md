@@ -9,6 +9,7 @@ It integrates with a Django REST backend and features a responsive Vite + ReactJ
 
 - *🔗 Frontend (Web Dashboard):* [https://alertfi-web-f5b98.web.app/](https://alertfi-web-f5b98.web.app/)
 - *🔗 Backend (Django API):* [https://alertfi-web-7jgc.onrender.com/](https://alertfi-web-7jgc.onrender.com/)
+- *🔗 Flutter (Mobile App):* https://drive.google.com/file/d/1pAHFBBEF7HVOv958Xw1ns0bH5XjVCyDd/view?usp=drivesdk
 ---
 
 ## 🧩 Features
