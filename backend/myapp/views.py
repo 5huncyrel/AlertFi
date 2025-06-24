@@ -85,13 +85,15 @@ class ESP32DataReceiveView(APIView):
         except Detector.DoesNotExist:
             return Response({"error": "Invalid detector ID"}, status=400)
 
+        # Always store detector reading
         DetectorReading.objects.create(
             detector=detector,
             ppm=ppm,
             battery=battery,
         )
 
-        if status:
+        # Store only if status is WARNING or DANGER
+        if status in ["WARNING", "DANGER"]:
             AlertLog.objects.create(
                 detector=detector,
                 status=status,
