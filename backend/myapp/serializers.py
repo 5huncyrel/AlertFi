@@ -1,7 +1,7 @@
 # myapp/serializers.py
 
 from rest_framework import serializers
-from .models import User, Detector, DetectorReading, AlertLog
+from .models import User, Detector, DetectorReading
 from django.contrib.auth.password_validation import validate_password
 
 class UserSerializer(serializers.ModelSerializer):
@@ -34,7 +34,3 @@ class DetectorReadingSerializer(serializers.ModelSerializer):
         model = DetectorReading
         fields = '__all__'
 
-class AlertLogSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = AlertLog
-        fields = '__all__'

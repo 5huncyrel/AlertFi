@@ -3,7 +3,7 @@
 from django.urls import path
 from .views import (
     RegisterView, UserDetailView, UpdateEmailView, ChangePasswordView,
-    DetectorListView, DetectorDataView, AlertHistoryView, ESP32DataReceiveView
+    DetectorListView, DetectorDataView, DetectorReadingsView, ESP32DataReceiveView
 )
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
@@ -16,6 +16,6 @@ urlpatterns = [
     path('user/change-password/', ChangePasswordView.as_view()),
     path('detectors/', DetectorListView.as_view()),
     path('detectors/<int:pk>/data/', DetectorDataView.as_view()),
-    path('detectors/<int:pk>/alerts/', AlertHistoryView.as_view()),
+    path('detectors/<int:pk>/readings/', DetectorReadingsView.as_view()),
     path('esp32/data/', ESP32DataReceiveView.as_view()),
 ]

@@ -1,27 +1,33 @@
 # myapp/views.py
 
 
-from rest_framework import generics, permissions, status
+from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from .models import User, Detector, DetectorReading, AlertLog
 from .serializers import (
     UserSerializer, RegisterSerializer,
     DetectorSerializer, DetectorReadingSerializer, AlertLogSerializer
 )
 from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework.permissions import IsAuthenticated
 
+
+# 🔐 User Registration
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = RegisterSerializer
 
+
+# 👤 Authenticated User Info
 class UserDetailView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         return Response(UserSerializer(request.user).data)
 
+
+# ✉️ Update Email
 class UpdateEmailView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -31,6 +37,8 @@ class UpdateEmailView(APIView):
         request.user.save()
         return Response({'message': 'Email updated'})
 
+
+# 🔒 Change Password
 class ChangePasswordView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -40,6 +48,8 @@ class ChangePasswordView(APIView):
         request.user.save()
         return Response({'message': 'Password changed'})
 
+
+# 📟 List Detectors for Logged-in User
 class DetectorListView(generics.ListAPIView):
     serializer_class = DetectorSerializer
     permission_classes = [IsAuthenticated]
@@ -47,6 +57,8 @@ class DetectorListView(generics.ListAPIView):
     def get_queryset(self):
         return Detector.objects.filter(user=self.request.user)
 
+
+# 🏠 Home: Latest Detector Reading (SAFE, WARNING, DANGER)
 class DetectorDataView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -55,22 +67,21 @@ class DetectorDataView(APIView):
         latest = DetectorReading.objects.filter(detector=detector).first()
         return Response(DetectorReadingSerializer(latest).data)
 
-class AlertHistoryView(APIView):
+
+# 📜 History: WARNING and DANGER Only
+class DetectorReadingsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, pk):
-        logs = AlertLog.objects.filter(detector__id=pk, detector__user=request.user)
-        return Response(AlertLogSerializer(logs, many=True).data)
+        readings = DetectorReading.objects.filter(
+            detector__id=pk,
+            detector__user=request.user,
+            status__in=["WARNING", "DANGER"]
+        )
+        return Response(DetectorReadingSerializer(readings, many=True).data)
 
-    def post(self, request, pk):
-        detector = Detector.objects.get(id=pk)
-        data = request.data.copy()
-        data['detector'] = detector.id
-        serializer = AlertLogSerializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+# 📡 ESP32 Endpoint for Sending Data
 class ESP32DataReceiveView(APIView):
     permission_classes = []  # No auth for ESP32
 
@@ -85,19 +96,12 @@ class ESP32DataReceiveView(APIView):
         except Detector.DoesNotExist:
             return Response({"error": "Invalid detector ID"}, status=400)
 
-        # Always store detector reading
+        # Save all readings
         DetectorReading.objects.create(
             detector=detector,
             ppm=ppm,
             battery=battery,
+            status=status
         )
-
-        # Store only if status is WARNING or DANGER
-        if status in ["WARNING", "DANGER"]:
-            AlertLog.objects.create(
-                detector=detector,
-                status=status,
-                ppm=ppm
-            )
 
         return Response({"message": "Data received"}, status=201)
