@@ -29,15 +29,6 @@ DATABASES = {
     )
 }
 
-# Override for local development if DATABASE_URL is not set
-if not os.getenv("DATABASE_URL"):
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
@@ -109,7 +100,7 @@ TEMPLATES = [
 
 CORS_ALLOW_ALL_ORIGINS = True
 
-AUTH_USER_MODEL = 'myapp.User'  # or custom user if defined
+AUTH_USER_MODEL = 'auth.User'  # or custom user if defined
 
 # Channels config
 ASGI_APPLICATION = 'myproject.asgi.application'
