@@ -8,7 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from .models import User, Detector, DetectorReading
 from .serializers import (
     UserSerializer, RegisterSerializer,
-    DetectorSerializer, DetectorReadingSerializer, AlertLogSerializer
+    DetectorSerializer, DetectorReadingSerializer
 )
 from rest_framework_simplejwt.views import TokenObtainPairView
 
