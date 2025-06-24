@@ -15,6 +15,8 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+AUTH_USER_MODEL = 'myapp.User'  # or custom user if defined
+
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
@@ -100,7 +102,6 @@ TEMPLATES = [
 
 CORS_ALLOW_ALL_ORIGINS = True
 
-AUTH_USER_MODEL = 'auth.User'  # or custom user if defined
 
 # Channels config
 ASGI_APPLICATION = 'myproject.asgi.application'
