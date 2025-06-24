@@ -5,7 +5,9 @@ import django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'myproject.settings')
 django.setup()
 
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 # Create superuser if it doesn't already exist
 username = "admin"
