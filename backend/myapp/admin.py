@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import User, Detector, DetectorReading, AlertLog
+from .models import User, Detector, DetectorReading
 
 @admin.register(DetectorReading)
 class DetectorReadingAdmin(admin.ModelAdmin):
