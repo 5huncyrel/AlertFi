@@ -26,5 +26,5 @@ class DetectorReading(models.Model):
         ordering = ['-timestamp']
 
     def __str__(self):
-        return f"{self.detector.name} - {self.ppm} PPM @ {self.timestamp.strftime('%Y-%m-%d %H:%M:%S')}"
+        return f"{self.detector.name} - {self.ppm} PPM {self.status} @ {self.timestamp.strftime('%Y-%m-%d %H:%M:%S')}"
 
