@@ -3,6 +3,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+
 class User(AbstractUser):
     notifications_enabled = models.BooleanField(default=True)
 
@@ -23,6 +24,9 @@ class DetectorReading(models.Model):
     class Meta:
         ordering = ['-timestamp']
 
+    def __str__(self):
+        return f"{self.detector.name} - {self.ppm} PPM @ {self.timestamp.strftime('%Y-%m-%d %H:%M:%S')}"
+
 class AlertLog(models.Model):
     detector = models.ForeignKey(Detector, on_delete=models.CASCADE)
     status = models.CharField(max_length=50)
@@ -31,3 +35,6 @@ class AlertLog(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.detector.name} - {self.status} ({self.ppm} PPM)"
