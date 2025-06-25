@@ -63,9 +63,18 @@ class DetectorDataView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, pk):
-        detector = Detector.objects.get(id=pk, user=request.user)
+        try:
+            detector = Detector.objects.get(id=pk, user=request.user)
+        except Detector.DoesNotExist:
+            return Response({'error': 'Detector not found'}, status=404)
+
         latest = DetectorReading.objects.filter(detector=detector).first()
-        return Response(DetectorReadingSerializer(latest).data)
+        data = DetectorReadingSerializer(latest).data if latest else {}
+
+        # ✅ Include sensor_on in the response so Flutter sees the correct value
+        data['sensor_on'] = detector.sensor_on  
+
+        return Response(data)
 
 
 # 📜 History: WARNING and DANGER Only
