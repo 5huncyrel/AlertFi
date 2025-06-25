@@ -105,3 +105,16 @@ class ESP32DataReceiveView(APIView):
         )
 
         return Response({"message": "Data received"}, status=201)
+    
+# ✅ Toggle Sensor On/Off
+class ToggleSensorView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request, pk):
+        try:
+            detector = Detector.objects.get(id=pk, user=request.user)
+            detector.sensor_on = not detector.sensor_on
+            detector.save()
+            return Response({'sensor_on': detector.sensor_on})
+        except Detector.DoesNotExist:
+            return Response({'error': 'Detector not found'}, status=404)
