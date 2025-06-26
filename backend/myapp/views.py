@@ -1,16 +1,15 @@
 # myapp/views.py
-
-
 from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from .models import User, Detector, DetectorReading
+from .models import User, Detector, DetectorReading, FCMToken
 from .serializers import (
     UserSerializer, RegisterSerializer,
-    DetectorSerializer, DetectorReadingSerializer
+    DetectorSerializer, DetectorReadingSerializer, FCMTokenSerializer
 )
 from rest_framework_simplejwt.views import TokenObtainPairView
+from .notifications import send_push_notification
 
 
 # 🔐 User Registration
@@ -71,9 +70,7 @@ class DetectorDataView(APIView):
         latest = DetectorReading.objects.filter(detector=detector).first()
         data = DetectorReadingSerializer(latest).data if latest else {}
 
-        # ✅ Include sensor_on in the response so Flutter sees the correct value
-        data['sensor_on'] = detector.sensor_on  
-
+        data['sensor_on'] = detector.sensor_on
         return Response(data)
 
 
@@ -105,16 +102,23 @@ class ESP32DataReceiveView(APIView):
         except Detector.DoesNotExist:
             return Response({"error": "Invalid detector ID"}, status=400)
 
-        # Save all readings
-        DetectorReading.objects.create(
+        # Save the reading
+        reading = DetectorReading.objects.create(
             detector=detector,
             ppm=ppm,
             battery=battery,
             status=status
         )
 
+        # Send push notification if status is DANGER
+        if status == "DANGER":
+            tokens = FCMToken.objects.filter(user=detector.user).values_list('token', flat=True)
+            for token in tokens:
+                send_push_notification(token, "🚨 Fire Alert", f"{detector.name} detected dangerous gas levels!")
+
         return Response({"message": "Data received"}, status=201)
-    
+
+
 # ✅ Toggle Sensor On/Off
 class ToggleSensorView(APIView):
     permission_classes = [IsAuthenticated]
@@ -127,3 +131,16 @@ class ToggleSensorView(APIView):
             return Response({'sensor_on': detector.sensor_on})
         except Detector.DoesNotExist:
             return Response({'error': 'Detector not found'}, status=404)
+
+
+# 🔐 Save FCM Token from Mobile App
+class SaveFCMTokenView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        token = request.data.get('token')
+        if not token:
+            return Response({'error': 'Token is required'}, status=400)
+
+        FCMToken.objects.update_or_create(user=request.user, token=token)
+        return Response({'message': 'Token saved'})

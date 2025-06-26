@@ -1,7 +1,6 @@
 # myapp/admin.py
-
 from django.contrib import admin
-from .models import User, Detector, DetectorReading
+from .models import User, Detector, DetectorReading, FCMToken
 
 @admin.register(DetectorReading)
 class DetectorReadingAdmin(admin.ModelAdmin):
@@ -12,6 +11,11 @@ class DetectorReadingAdmin(admin.ModelAdmin):
 @admin.register(Detector)
 class DetectorAdmin(admin.ModelAdmin):
     list_display = ('name', 'location', 'sensor_on', 'user')
-    readonly_fields = ('sensor_on',)  
+    readonly_fields = ('sensor_on',)
+
+@admin.register(FCMToken)
+class FCMTokenAdmin(admin.ModelAdmin):
+    list_display = ('user', 'token', 'created_at')
+    search_fields = ('user__username', 'token')
 
 admin.site.register(User)

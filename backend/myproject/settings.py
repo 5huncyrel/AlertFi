@@ -173,3 +173,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# 🔐 Firebase Admin SDK credentials
+FIREBASE_SERVICE_ACCOUNT = os.path.join(BASE_DIR, 'alertfi-67490-firebase-adminsdk-fbsvc-6062825ace.json') 

@@ -1,13 +1,14 @@
 # myapp/serializers.py
-
 from rest_framework import serializers
-from .models import User, Detector, DetectorReading
+from .models import User, Detector, DetectorReading, FCMToken
 from django.contrib.auth.password_validation import validate_password
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'username', 'email', 'notifications_enabled')
+
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, validators=[validate_password])
@@ -24,13 +25,21 @@ class RegisterSerializer(serializers.ModelSerializer):
         )
         return user
 
+
 class DetectorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Detector
         fields = '__all__'
+
 
 class DetectorReadingSerializer(serializers.ModelSerializer):
     class Meta:
         model = DetectorReading
         fields = '__all__'
 
+
+# ✅ NEW: FCM Token Serializer
+class FCMTokenSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FCMToken
+        fields = ('token',)
