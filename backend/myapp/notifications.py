@@ -3,13 +3,12 @@
 import firebase_admin
 from firebase_admin import credentials, messaging
 import os
+from django.conf import settings  # 🔐 Import from Django settings
 
 # Initialize Firebase only once
 if not firebase_admin._apps:
-    cred_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'alertfi-67490-firebase-adminsdk-fbsvc-6062825ace.json')
-    cred = credentials.Certificate(cred_path)
+    cred = credentials.Certificate(settings.FIREBASE_SERVICE_ACCOUNT)
     firebase_admin.initialize_app(cred)
-
 
 def send_push_notification(token, title, body):
     try:

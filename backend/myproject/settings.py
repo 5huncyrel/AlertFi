@@ -174,5 +174,17 @@ USE_TZ = True
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# 🔐 Firebase Admin SDK credentials
-FIREBASE_SERVICE_ACCOUNT = os.path.join(BASE_DIR, 'alertfi-67490-firebase-adminsdk-fbsvc-6062825ace.json') 
+import base64
+
+# 🔐 Decode Firebase key from environment and write to a temporary file
+FIREBASE_KEY_PATH = os.path.join(BASE_DIR, 'firebase_key.json')
+firebase_key_base64 = os.environ.get('FIREBASE_KEY_BASE64')
+
+if firebase_key_base64:
+    with open(FIREBASE_KEY_PATH, 'w') as f:
+        f.write(base64.b64decode(firebase_key_base64).decode('utf-8'))
+else:
+    raise Exception("FIREBASE_KEY_BASE64 is not set in the environment!")
+
+# 🔐 Set this so other files (like notifications.py) can use it
+FIREBASE_SERVICE_ACCOUNT = FIREBASE_KEY_PATH
