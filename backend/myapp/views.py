@@ -87,7 +87,7 @@ class DetectorReadingsView(APIView):
         return Response(DetectorReadingSerializer(readings, many=True).data)
 
 
-# 📡 ESP32 Endpoint for Sending Data
+# 📡 ESP32 Endpoint for Receiving Data
 class ESP32DataReceiveView(APIView):
     permission_classes = []  # No auth for ESP32
 
@@ -110,11 +110,17 @@ class ESP32DataReceiveView(APIView):
             status=status
         )
 
-        # Send push notification if status is DANGER
-        if status == "DANGER":
+        # ✅ Send push notification only if:
+        # 1) status is DANGER AND
+        # 2) user wants notifications
+        if status == "DANGER" and detector.user.notifications_enabled:
             tokens = FCMToken.objects.filter(user=detector.user).values_list('token', flat=True)
             for token in tokens:
-                send_push_notification(token, "🚨 Fire Alert", f"{detector.name} detected dangerous gas levels!")
+                send_push_notification(
+                    token,
+                    "🚨 Fire Alert",
+                    f"{detector.name} detected dangerous gas levels!"
+                )
 
         return Response({"message": "Data received"}, status=201)
 
