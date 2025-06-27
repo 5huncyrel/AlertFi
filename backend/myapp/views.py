@@ -144,3 +144,17 @@ class FCMTokenView(APIView):
 
         FCMToken.objects.update_or_create(user=request.user, token=token)
         return Response({'message': 'Token saved'})
+    
+    
+# ✅ Toggle Notifications On/Off
+class ToggleNotificationsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request):
+        user = request.user
+        user.notifications_enabled = not user.notifications_enabled
+        user.save()
+        return Response({
+            'notifications_enabled': user.notifications_enabled
+        })
+        
