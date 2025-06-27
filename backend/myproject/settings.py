@@ -174,6 +174,9 @@ USE_TZ = True
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+from dotenv import load_dotenv
+load_dotenv()
+
 import base64
 
 # 🔐 Decode Firebase key from environment and write to a temporary file
