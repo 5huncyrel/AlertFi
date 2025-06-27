@@ -134,7 +134,7 @@ class ToggleSensorView(APIView):
 
 
 # 🔐 Save FCM Token from Mobile App
-class SaveFCMTokenView(APIView):
+class FCMTokenView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
