@@ -60,6 +60,14 @@ class DetectorListView(generics.ListCreateAPIView):
         serializer.save(user=self.request.user)
 
 
+class DetectorDetailView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = DetectorSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Detector.objects.filter(user=self.request.user)
+
+
 # 🏠 Home: Latest Detector Reading (SAFE, WARNING, DANGER)
 class DetectorDataView(APIView):
     permission_classes = [IsAuthenticated]

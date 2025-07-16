@@ -29,7 +29,8 @@ class RegisterSerializer(serializers.ModelSerializer):
 class DetectorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Detector
-        fields = '__all__'
+        fields = ['id', 'name', 'location', 'sensor_on'] 
+        read_only_fields = ['id', 'sensor_on']
 
 
 class DetectorReadingSerializer(serializers.ModelSerializer):
