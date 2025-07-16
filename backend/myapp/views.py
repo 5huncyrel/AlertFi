@@ -82,7 +82,11 @@ class DetectorDataView(APIView):
         data = DetectorReadingSerializer(latest).data if latest else {}
 
         data['sensor_on'] = detector.sensor_on
+        data['name'] = detector.name            
+        data['location'] = detector.location   
+
         return Response(data)
+
 
 
 # 📜 History: WARNING and DANGER Only
