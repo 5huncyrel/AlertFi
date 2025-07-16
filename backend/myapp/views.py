@@ -48,13 +48,16 @@ class ChangePasswordView(APIView):
         return Response({'message': 'Password changed'})
 
 
-# 📟 List Detectors for Logged-in User
-class DetectorListView(generics.ListAPIView):
+# 📟 List & Add Detectors for Logged-in User
+class DetectorListView(generics.ListCreateAPIView):
     serializer_class = DetectorSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return Detector.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 
 # 🏠 Home: Latest Detector Reading (SAFE, WARNING, DANGER)
