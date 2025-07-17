@@ -19,7 +19,7 @@ urlpatterns = [
     path('detectors/<int:pk>/', DetectorDetailView.as_view()),
     path('detectors/<int:pk>/data/', DetectorDataView.as_view()),
     path('detectors/<int:pk>/readings/', DetectorReadingsView.as_view()),
-    path('api/readings/<int:pk>/', DetectorReadingDetailView.as_view()),
+    path('readings/<int:pk>/', DetectorReadingDetailView.as_view()),
     path('esp32/data/', ESP32DataReceiveView.as_view()),
     path('detectors/<int:pk>/toggle/', ToggleSensorView.as_view()),
     path('fcm/save-token/', FCMTokenView.as_view()),
