@@ -102,6 +102,17 @@ class DetectorReadingsView(APIView):
         return Response(DetectorReadingSerializer(readings, many=True).data)
 
 
+
+class DetectorReadingDetailView(generics.DestroyAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = DetectorReading.objects.all()
+    serializer_class = DetectorReadingSerializer
+
+    def get_queryset(self):
+        return self.queryset.filter(detector__user=self.request.user)
+
+
+
 # 📡 ESP32 Endpoint for Receiving Data
 class ESP32DataReceiveView(APIView):
     permission_classes = []  # No auth for ESP32
