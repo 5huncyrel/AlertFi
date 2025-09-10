@@ -1,0 +1,42 @@
+/* Example for general layout */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #FFF8DC;
+}
+
+.welcome-screen {
+  text-align: center;
+  padding: 50px;
+}
+
+h1 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+p {
+  margin-bottom: 20px;
+}
+
+a {
+  text-decoration: none;
+  color: #007bff;
+  margin: 10px;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Media Queries for responsiveness */
+@media (min-width: 768px) {
+  .welcome-screen {
+    padding: 80px;
+  }
+
+  h1 {
+    font-size: 3rem;
+  }
+}

@@ -4,8 +4,8 @@ from .models import User, Detector, DetectorReading, FCMToken
 
 @admin.register(DetectorReading)
 class DetectorReadingAdmin(admin.ModelAdmin):
-    list_display = ('detector', 'ppm', 'status', 'battery', 'timestamp')
-    list_filter = ('detector',)
+    list_display = ('detector', 'ppm', 'temperature', 'humidity', 'status', 'battery', 'timestamp')
+    list_filter = ('detector', 'status')
     search_fields = ('detector__name',)
 
 @admin.register(Detector)

@@ -122,6 +122,8 @@ class ESP32DataReceiveView(APIView):
         ppm = request.data.get("ppm")
         battery = request.data.get("battery", 100)
         status = request.data.get("status")
+        temperature = request.data.get("temperature")  # 🌡️ NEW
+        humidity = request.data.get("humidity")        # 💧 NEW
 
         try:
             detector = Detector.objects.get(id=detector_id)
@@ -133,12 +135,12 @@ class ESP32DataReceiveView(APIView):
             detector=detector,
             ppm=ppm,
             battery=battery,
-            status=status
+            status=status,
+            temperature=temperature,  # ✅ NEW
+            humidity=humidity         # ✅ NEW
         )
 
-        # ✅ Send push notification only if:
-        # 1) status is DANGER AND
-        # 2) user wants notifications
+        # ✅ Push notification if danger
         if status == "DANGER" and detector.user.notifications_enabled:
             tokens = FCMToken.objects.filter(user=detector.user).values_list('token', flat=True)
             for token in tokens:
@@ -149,6 +151,7 @@ class ESP32DataReceiveView(APIView):
                 )
 
         return Response({"message": "Data received"}, status=201)
+
 
 
 # ✅ Toggle Sensor On/Off

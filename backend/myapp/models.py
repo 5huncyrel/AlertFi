@@ -19,7 +19,9 @@ class Detector(models.Model):
 
 class DetectorReading(models.Model):
     detector = models.ForeignKey(Detector, on_delete=models.CASCADE)
-    ppm = models.IntegerField()
+    ppm = models.IntegerField()  
+    temperature = models.FloatField(null=True, blank=True)  
+    humidity = models.FloatField(null=True, blank=True)     
     status = models.CharField(max_length=50)
     battery = models.IntegerField()
     timestamp = models.DateTimeField(auto_now_add=True)
@@ -28,7 +30,12 @@ class DetectorReading(models.Model):
         ordering = ['-timestamp']
 
     def __str__(self):
-        return f"{self.detector.name} - {self.ppm} PPM {self.status} @ {self.timestamp.strftime('%Y-%m-%d %H:%M:%S')}"
+        return (
+            f"{self.detector.name} - {self.ppm} PPM, "
+            f"{self.temperature}°C, {self.humidity}% - "
+            f"{self.status} @ {self.timestamp.strftime('%Y-%m-%d %H:%M:%S')}"
+        )
+
 
 
 class FCMToken(models.Model):
