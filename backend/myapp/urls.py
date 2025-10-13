@@ -1,7 +1,8 @@
 # myapp/urls.py
 from django.urls import path  
 from .views import (
-    RegisterView, UserDetailView, UpdateEmailView, ChangePasswordView,
+    RegisterView, UserDetailView, UpdateEmailView, ChangePasswordView, 
+    AdminLoginView, AdminUsersView, AdminDetectorsView, AdminReadingsView,
     DetectorListView, DetectorDetailView, DetectorDataView, DetectorReadingsView, 
     DetectorReadingDetailView, ESP32DataReceiveView, ToggleSensorView, FCMTokenView,
     ToggleNotificationsView
@@ -15,6 +16,10 @@ urlpatterns = [
     path('user/', UserDetailView.as_view()),
     path('user/update-email/', UpdateEmailView.as_view()),
     path('user/change-password/', ChangePasswordView.as_view()),
+    path('admin/login/', AdminLoginView.as_view()),
+    path('admin/users/', AdminUsersView.as_view()),
+    path('admin/detectors/', AdminDetectorsView.as_view()),
+    path('admin/readings/', AdminReadingsView.as_view()),
     path('detectors/', DetectorListView.as_view()),
     path('detectors/<int:pk>/', DetectorDetailView.as_view()),
     path('detectors/<int:pk>/data/', DetectorDataView.as_view()),

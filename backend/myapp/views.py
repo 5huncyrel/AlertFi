@@ -3,13 +3,14 @@ from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from .models import User, Detector, DetectorReading, FCMToken
+from .models import User, Admin, Detector, DetectorReading, FCMToken
 from .serializers import (
-    UserSerializer, RegisterSerializer,
+    UserSerializer, AdminSerializer, RegisterSerializer,
     DetectorSerializer, DetectorReadingSerializer, FCMTokenSerializer
 )
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .notifications import send_push_notification
+from django.contrib.auth.hashers import check_password
 
 
 # 🔐 User Registration
@@ -46,6 +47,7 @@ class ChangePasswordView(APIView):
         request.user.set_password(password)
         request.user.save()
         return Response({'message': 'Password changed'})
+
 
 
 # 📟 List & Add Detectors for Logged-in User
@@ -88,7 +90,6 @@ class DetectorDataView(APIView):
         return Response(data)
 
 
-
 # 📜 History: WARNING and DANGER Only
 class DetectorReadingsView(APIView):
     permission_classes = [IsAuthenticated]
@@ -102,7 +103,6 @@ class DetectorReadingsView(APIView):
         return Response(DetectorReadingSerializer(readings, many=True).data)
 
 
-
 class DetectorReadingDetailView(generics.DestroyAPIView):
     permission_classes = [IsAuthenticated]
     queryset = DetectorReading.objects.all()
@@ -110,6 +110,62 @@ class DetectorReadingDetailView(generics.DestroyAPIView):
 
     def get_queryset(self):
         return self.queryset.filter(detector__user=self.request.user)
+
+
+
+
+# 🌐 Website Admin Endpoints
+class AdminLoginView(APIView):
+    """
+    Allows the website admin to log in using email and password.
+    """
+    def post(self, request):
+        email = request.data.get('email')
+        password = request.data.get('password')
+
+        try:
+            admin = Admin.objects.get(email=email)
+            if check_password(password, admin.password):
+                serializer = AdminSerializer(admin)
+                return Response({
+                    "message": "Login successful",
+                    "admin": serializer.data
+                }, status=status.HTTP_200_OK)
+            else:
+                return Response({"error": "Invalid password"}, status=status.HTTP_401_UNAUTHORIZED)
+        except Admin.DoesNotExist:
+            return Response({"error": "Admin not found"}, status=status.HTTP_404_NOT_FOUND)
+
+
+class AdminUsersView(APIView):
+    """
+    Returns a list of all registered users for the admin dashboard.
+    """
+    def get(self, request):
+        users = User.objects.all()
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data)
+
+
+class AdminDetectorsView(APIView):
+    """
+    Returns a list of all detectors in the system.
+    """
+    def get(self, request):
+        detectors = Detector.objects.select_related('user').all()
+        serializer = DetectorSerializer(detectors, many=True)
+        return Response(serializer.data)
+
+
+class AdminReadingsView(APIView):
+    """
+    Returns recent detector readings for all detectors.
+    """
+    def get(self, request):
+        readings = DetectorReading.objects.select_related('detector').all()[:100]
+        serializer = DetectorReadingSerializer(readings, many=True)
+        return Response(serializer.data)
+
 
 
 
@@ -151,6 +207,7 @@ class ESP32DataReceiveView(APIView):
                 )
 
         return Response({"message": "Data received"}, status=201)
+
 
 
 
