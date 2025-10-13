@@ -7,7 +7,7 @@ from django.contrib.auth.password_validation import validate_password
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'notifications_enabled')
+        fields = ('id', 'username', 'email', 'notifications_enabled', 'address')
 
 class AdminSerializer(serializers.ModelSerializer):
     class Meta:
@@ -19,13 +19,14 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('username', 'email', 'password')
+        fields = ('username', 'email', 'password', 'address')
 
     def create(self, validated_data):
         user = User.objects.create_user(
             username=validated_data['username'],
             email=validated_data['email'],
-            password=validated_data['password']
+            password=validated_data['password'],
+            address=validated_data.get('address', '')
         )
         return user
 

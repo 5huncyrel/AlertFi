@@ -5,6 +5,7 @@ from django.db import models
 
 class User(AbstractUser):
     notifications_enabled = models.BooleanField(default=True)
+    address = models.CharField(max_length=255, blank=True, null=True)
     
     
 class Admin(models.Model):
