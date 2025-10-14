@@ -252,6 +252,5 @@ class ToggleNotificationsView(APIView):
         user.notifications_enabled = not user.notifications_enabled
         user.save()
         return Response({
-            'notifications_enabled': user.notifications_enabled
-        })
+            'notifications_enabled': user.notifications_enabled})
         
