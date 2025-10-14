@@ -3,14 +3,18 @@ from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+from rest_framework_simplejwt.views import TokenObtainPairView
+from .notifications import send_push_notification
+from django.contrib.auth.hashers import check_password
 from .models import User, Admin, Detector, DetectorReading, FCMToken
 from .serializers import (
     UserSerializer, AdminSerializer, RegisterSerializer,
     DetectorSerializer, DetectorReadingSerializer, FCMTokenSerializer
 )
-from rest_framework_simplejwt.views import TokenObtainPairView
-from .notifications import send_push_notification
-from django.contrib.auth.hashers import check_password
+
 
 
 # 🔐 User Registration
@@ -115,10 +119,13 @@ class DetectorReadingDetailView(generics.DestroyAPIView):
 
 
 # 🌐 Website Admin Endpoints
+@method_decorator(csrf_exempt, name='dispatch')  # ✅ disables CSRF for this endpoint
 class AdminLoginView(APIView):
     """
     Allows the website admin to log in using email and password.
     """
+    permission_classes = [AllowAny]  # ✅ allows login without authentication
+
     def post(self, request):
         email = request.data.get('email')
         password = request.data.get('password')
