@@ -119,13 +119,11 @@ class DetectorReadingDetailView(generics.DestroyAPIView):
 
 
 # 🌐 Website Admin Endpoints
-@method_decorator(csrf_exempt, name='dispatch')  # ✅ disables CSRF for this endpoint
+@method_decorator(csrf_exempt, name='dispatch')
 class AdminLoginView(APIView):
     """
     Allows the website admin to log in using email and password.
     """
-    permission_classes = [AllowAny]  # ✅ allows login without authentication
-
     def post(self, request):
         email = request.data.get('email')
         password = request.data.get('password')
