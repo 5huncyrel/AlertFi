@@ -5,8 +5,8 @@ from .models import User, Detector, DetectorReading, FCMToken
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('full_name', 'email', 'address', 'notifications_enabled')
-    search_fields = ('full_name', 'email', 'address')
+    list_display = ('email', 'full_name', 'address', 'notifications_enabled')
+    search_fields = ('email', 'full_name', 'email', 'address')
     list_filter = ( 'notifications_enabled',)
 
 @admin.register(DetectorReading)
