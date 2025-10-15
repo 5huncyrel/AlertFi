@@ -18,7 +18,6 @@ class DetectorReadingAdmin(admin.ModelAdmin):
         'temperature',
         'humidity',
         'status',
-        'battery',
         'timestamp'
     )
     list_filter = ('detector', 'status')
@@ -31,8 +30,8 @@ class DetectorReadingAdmin(admin.ModelAdmin):
 
 @admin.register(Detector)
 class DetectorAdmin(admin.ModelAdmin):
-    list_display = ('name', 'location', 'sensor_on', 'user')
-    readonly_fields = ('sensor_on',)
+    list_display = ('name', 'location', 'sensor_on', 'battery', 'user')
+    readonly_fields = ('sensor_on', 'battery')
 
 @admin.register(FCMToken)
 class FCMTokenAdmin(admin.ModelAdmin):
