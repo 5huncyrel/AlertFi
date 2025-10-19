@@ -90,7 +90,6 @@ class DetectorDataView(APIView):
         data['sensor_on'] = detector.sensor_on
         data['name'] = detector.name            
         data['location'] = detector.location   
-        data['battery'] = detector.battery
 
         return Response(data)
 

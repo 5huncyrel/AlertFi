@@ -23,7 +23,6 @@ class Detector(models.Model):
     name = models.CharField(max_length=50)
     location = models.CharField(max_length=100)
     sensor_on = models.BooleanField(default=True)
-    battery = models.IntegerField(default=100) 
 
     def __str__(self):
         return f"{self.name} ({self.location})"
@@ -35,6 +34,7 @@ class DetectorReading(models.Model):
     temperature = models.FloatField(null=True, blank=True)  
     humidity = models.FloatField(null=True, blank=True)     
     status = models.CharField(max_length=50)
+    battery = models.IntegerField()
     timestamp = models.DateTimeField(auto_now_add=True)
 
     class Meta:
