@@ -34,7 +34,7 @@ class DetectorReading(models.Model):
     temperature = models.FloatField(null=True, blank=True)  
     humidity = models.FloatField(null=True, blank=True)     
     status = models.CharField(max_length=50)
-    battery = models.IntegerField()
+    battery = models.IntegerField(default=100)
     timestamp = models.DateTimeField(auto_now_add=True)
 
     class Meta:
