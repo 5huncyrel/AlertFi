@@ -9,12 +9,10 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ('id', 'username', 'email', 'full_name','notifications_enabled', 'address')
 
-
 class AdminSerializer(serializers.ModelSerializer):
     class Meta:
         model = Admin
         fields = ['id', 'email', 'full_name']
-
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, validators=[validate_password])
@@ -35,17 +33,10 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class DetectorSerializer(serializers.ModelSerializer):
-    wifi_password = serializers.CharField(write_only=True, required=False)
-    user_password = serializers.CharField(write_only=True, required=False)
-
     class Meta:
         model = Detector
-        fields = [
-            'id', 'name', 'location', 'sensor_on',
-            'wifi_ssid', 'wifi_password', 'user_email', 'user_password'
-        ]
+        fields = ['id', 'name', 'location', 'sensor_on'] 
         read_only_fields = ['id', 'sensor_on']
-
 
 
 class DetectorReadingSerializer(serializers.ModelSerializer):
