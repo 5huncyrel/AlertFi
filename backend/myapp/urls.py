@@ -4,7 +4,7 @@ from .views import (
     RegisterView, UserDetailView, UpdateEmailView, ChangePasswordView, 
     AdminLoginView, AdminUsersView, AdminDetectorsView, AdminReadingsView,
     DetectorListView, DetectorDetailView, DetectorDataView, DetectorReadingsView, 
-    DetectorReadingDetailView, ESP32DataReceiveView, ConfigureDetectorView, ToggleSensorView, FCMTokenView,
+    DetectorReadingDetailView, ESP32DataReceiveView, ConfigureDetectorView, ESP32ConfigFetchView, ToggleSensorView, FCMTokenView,
     ToggleNotificationsView
 )
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
@@ -32,5 +32,6 @@ urlpatterns = [
     path('detectors/<int:pk>/configure/', ConfigureDetectorView.as_view()),
     path('detectors/<int:pk>/toggle/', ToggleSensorView.as_view()),
     
+    path('esp32/config/', ESP32ConfigFetchView.as_view()),
     path('esp32/data/', ESP32DataReceiveView.as_view()),
 ]

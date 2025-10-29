@@ -136,6 +136,29 @@ class ConfigureDetectorView(APIView):
             "message": "Detector configuration updated successfully",
             "detector_id": detector.id
         }, status=200)
+        
+
+# 💡 ESP32 fetches its configuration by Detector ID
+class ESP32ConfigFetchView(APIView):
+    def get(self, request):
+        detector_id = request.query_params.get("detector_id")
+        if not detector_id:
+            return Response({"error": "Detector ID required"}, status=400)
+
+        try:
+            detector = Detector.objects.get(id=detector_id)
+        except Detector.DoesNotExist:
+            return Response({"error": "Detector not registered"}, status=404)
+
+        return Response({
+            "detector_id": detector.id,
+            "wifi_ssid": detector.wifi_ssid,
+            "wifi_password": detector.wifi_password,
+            "user_email": detector.user_email,
+            "user_password": detector.user_password,
+            "api_url": "https://alertfi.onrender.com/api/esp32/data/"
+        })
+
 
 
 # 🌐 Website Admin Endpoints
