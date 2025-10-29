@@ -116,6 +116,26 @@ class DetectorReadingDetailView(generics.DestroyAPIView):
         return self.queryset.filter(detector__user=self.request.user)
 
 
+# 💡 Configure Detector WiFi and User Info
+class ConfigureDetectorView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request, pk):
+        try:
+            detector = Detector.objects.get(id=pk, user=request.user)
+        except Detector.DoesNotExist:
+            return Response({'error': 'Detector not found'}, status=404)
+
+        detector.wifi_ssid = request.data.get("wifi_ssid", detector.wifi_ssid)
+        detector.wifi_password = request.data.get("wifi_password", detector.wifi_password)
+        detector.user_email = request.data.get("user_email", detector.user_email)
+        detector.user_password = request.data.get("user_password", detector.user_password)
+        detector.save()
+
+        return Response({
+            "message": "Detector configuration updated successfully",
+            "detector_id": detector.id
+        }, status=200)
 
 
 # 🌐 Website Admin Endpoints
@@ -212,7 +232,6 @@ class ESP32DataReceiveView(APIView):
                 )
 
         return Response({"message": "Data received"}, status=201)
-
 
 
 

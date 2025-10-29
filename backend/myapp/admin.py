@@ -31,8 +31,11 @@ class DetectorReadingAdmin(admin.ModelAdmin):
 
 @admin.register(Detector)
 class DetectorAdmin(admin.ModelAdmin):
-    list_display = ('name', 'location', 'sensor_on', 'user')
+    list_display = ('name', 'location', 'sensor_on', 'user', 'wifi_ssid', 'user_email')
     readonly_fields = ('sensor_on',)
+    search_fields = ('name', 'location', 'user__email', 'wifi_ssid', 'user_email')
+    exclude = ('wifi_password', 'user_password')
+
 
 @admin.register(FCMToken)
 class FCMTokenAdmin(admin.ModelAdmin):

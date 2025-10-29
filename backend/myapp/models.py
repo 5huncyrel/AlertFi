@@ -24,6 +24,12 @@ class Detector(models.Model):
     location = models.CharField(max_length=100)
     sensor_on = models.BooleanField(default=True)
 
+    # 🔹 New fields
+    wifi_ssid = models.CharField(max_length=100, blank=True, null=True)
+    wifi_password = models.CharField(max_length=100, blank=True, null=True)
+    user_email = models.EmailField(blank=True, null=True)
+    user_password = models.CharField(max_length=100, blank=True, null=True)
+
     def __str__(self):
         return f"{self.name} ({self.location})"
 
