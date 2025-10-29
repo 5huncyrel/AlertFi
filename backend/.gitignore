@@ -2,3 +2,7 @@
 alertfi-67490-firebase-adminsdk-fbsvc-6062825ace.json
 firebase_key.json
 firebase.txt
+*.pyc
+__pycache__/
+db.sqlite3
+*.log
