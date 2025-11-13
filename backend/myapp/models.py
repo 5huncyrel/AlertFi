@@ -7,15 +7,6 @@ class User(AbstractUser):
     notifications_enabled = models.BooleanField(default=True)
     full_name = models.CharField(max_length=255, blank=True, null=True)
     address = models.CharField(max_length=255, blank=True, null=True)
-    
-    
-class Admin(models.Model):
-    email = models.EmailField(unique=True)
-    password = models.CharField(max_length=255)
-    full_name = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.email
 
 
 class Detector(models.Model):

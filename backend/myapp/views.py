@@ -2,18 +2,19 @@
 from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework_simplejwt.views import TokenObtainPairView
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
-from rest_framework_simplejwt.views import TokenObtainPairView
+from django.contrib.auth import authenticate
 from .notifications import send_push_notification
 from django.contrib.auth.hashers import check_password
 
-from .models import User, Admin, Detector, DetectorReading, FCMToken
+from .models import User, Detector, DetectorReading, FCMToken
 from .serializers import (
-    UserSerializer, AdminSerializer, RegisterSerializer,
+    UserSerializer, RegisterSerializer,
     DetectorSerializer, DetectorReadingSerializer, FCMTokenSerializer
 )
 
@@ -124,27 +125,25 @@ class DetectorReadingDetailView(generics.DestroyAPIView):
 @method_decorator(csrf_exempt, name='dispatch')
 class AdminLoginView(APIView):
     """
-    Allows the website admin to log in using email and password.
+    Website admin login using email & password (User with is_staff=True).
     Returns JWT access & refresh tokens.
     """
     def post(self, request):
         email = request.data.get('email')
         password = request.data.get('password')
 
-        try:
-            admin = Admin.objects.get(email=email)
-            if check_password(password, admin.password):
-                # Generate JWT tokens
-                refresh = RefreshToken.for_user(admin)
-                return Response({
-                    "message": "Login successful",
-                    "access": str(refresh.access_token),
-                    "refresh": str(refresh)
-                }, status=status.HTTP_200_OK)
-            else:
-                return Response({"error": "Invalid password"}, status=status.HTTP_401_UNAUTHORIZED)
-        except Admin.DoesNotExist:
-            return Response({"error": "Admin not found"}, status=status.HTTP_404_NOT_FOUND)
+        # Authenticate using Django auth
+        user = authenticate(request, username=email, password=password)
+        if user is not None and user.is_staff:
+            # Generate JWT tokens
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                "message": "Login successful",
+                "access": str(refresh.access_token),
+                "refresh": str(refresh)
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "Invalid credentials or not admin"}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 # 🔐 Admin Users (JWT protected)
