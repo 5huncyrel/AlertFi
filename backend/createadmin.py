@@ -1,28 +1,23 @@
-import os
-import django
-
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "myproject.settings")
-django.setup()
-
 from django.contrib.auth import get_user_model
+from django.contrib.auth.hashers import make_password
+import os, django
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'myproject.settings')
+django.setup()
 
 User = get_user_model()
 
 def create_default_admin():
-    email = "admin@gmail.com"
-    password = "admin123"
-    username = "admin"  # can match email or anything
-
-    # Check if admin already exists
-    if not User.objects.filter(username=username, is_staff=True).exists():
-        User.objects.create_superuser(
-            username=username,
-            email=email,
-            password=password
+    if not User.objects.filter(is_staff=True, email="admin@gmail.com").exists():
+        User.objects.create(
+            email="admin@gmail.com",
+            password=make_password("admin123"),
+            is_staff=True,
+            is_superuser=True
         )
-        print(f"✅ Website admin created: {email} / {password}")
+        print("✅ Default admin created: admin@gmail.com / admin123")
     else:
-        print("ℹ️ Website admin already exists.")
+        print("ℹ️ Admin already exists.")
 
 if __name__ == "__main__":
     create_default_admin()

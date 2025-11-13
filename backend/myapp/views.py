@@ -132,18 +132,24 @@ class AdminLoginView(APIView):
         email = request.data.get("email")
         password = request.data.get("password")
 
-        # Authenticate using Django auth
-        user = authenticate(request, username=email, password=password)
-        if user is not None and user.is_staff:
-            # Generate JWT tokens
-            refresh = RefreshToken.for_user(user)
-            return Response({
-                "message": "Login successful",
-                "access": str(refresh.access_token),
-                "refresh": str(refresh)
-            }, status=status.HTTP_200_OK)
-        else:
-            return Response({"error": "Invalid credentials or not admin"}, status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            user = User.objects.get(email=email)  # ✅ get user by email
+        except User.DoesNotExist:
+            return Response({"error": "Invalid credentials"}, status=401)
+
+        if not user.check_password(password):
+            return Response({"error": "Invalid credentials"}, status=401)
+
+        if not user.is_staff:
+            return Response({"error": "Not an admin"}, status=401)
+
+        # Generate JWT tokens
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            "message": "Login successful",
+            "access": str(refresh.access_token),
+            "refresh": str(refresh)
+        }, status=status.HTTP_200_OK)
 
 
 # 🔐 Admin Users (JWT protected)
