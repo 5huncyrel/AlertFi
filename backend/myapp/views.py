@@ -2,13 +2,15 @@
 from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.permissions import AllowAny
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .notifications import send_push_notification
 from django.contrib.auth.hashers import check_password
+
 from .models import User, Admin, Detector, DetectorReading, FCMToken
 from .serializers import (
     UserSerializer, AdminSerializer, RegisterSerializer,
@@ -123,6 +125,7 @@ class DetectorReadingDetailView(generics.DestroyAPIView):
 class AdminLoginView(APIView):
     """
     Allows the website admin to log in using email and password.
+    Returns JWT access & refresh tokens.
     """
     def post(self, request):
         email = request.data.get('email')
@@ -131,10 +134,12 @@ class AdminLoginView(APIView):
         try:
             admin = Admin.objects.get(email=email)
             if check_password(password, admin.password):
-                serializer = AdminSerializer(admin)
+                # Generate JWT tokens
+                refresh = RefreshToken.for_user(admin)
                 return Response({
                     "message": "Login successful",
-                    "admin": serializer.data
+                    "access": str(refresh.access_token),
+                    "refresh": str(refresh)
                 }, status=status.HTTP_200_OK)
             else:
                 return Response({"error": "Invalid password"}, status=status.HTTP_401_UNAUTHORIZED)
@@ -142,30 +147,45 @@ class AdminLoginView(APIView):
             return Response({"error": "Admin not found"}, status=status.HTTP_404_NOT_FOUND)
 
 
+# 🔐 Admin Users (JWT protected)
 class AdminUsersView(APIView):
     """
     Returns a list of all registered users for the admin dashboard.
+    JWT authentication required.
     """
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
         users = User.objects.all()
         serializer = UserSerializer(users, many=True)
         return Response(serializer.data)
 
 
+# 🔐 Admin Detectors (JWT protected)
 class AdminDetectorsView(APIView):
     """
     Returns a list of all detectors in the system.
+    JWT authentication required.
     """
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
         detectors = Detector.objects.select_related('user').all()
         serializer = DetectorSerializer(detectors, many=True)
         return Response(serializer.data)
 
 
+# 🔐 Admin Readings (JWT protected)
 class AdminReadingsView(APIView):
     """
     Returns recent detector readings for all detectors.
+    JWT authentication required.
     """
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
         readings = DetectorReading.objects.select_related('detector').all()[:100]
         serializer = DetectorReadingSerializer(readings, many=True)
