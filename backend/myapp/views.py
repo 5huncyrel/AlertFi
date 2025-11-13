@@ -129,8 +129,8 @@ class AdminLoginView(APIView):
     Returns JWT access & refresh tokens.
     """
     def post(self, request):
-        email = request.data.get('email')
-        password = request.data.get('password')
+        email = request.data.get("email")
+        password = request.data.get("password")
 
         # Authenticate using Django auth
         user = authenticate(request, username=email, password=password)
