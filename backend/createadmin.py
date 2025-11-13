@@ -1,9 +1,10 @@
 import os
 import django
-from django.contrib.auth.models import User
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'myproject.settings')
 django.setup()
+
+from django.contrib.auth.models import User
 
 def create_default_admin():
     if not User.objects.filter(is_staff=True).exists():
