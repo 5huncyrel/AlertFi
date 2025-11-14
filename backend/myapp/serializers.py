@@ -41,6 +41,19 @@ class DetectorReadingSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class AdminDetectorSerializer(serializers.ModelSerializer):
+    user = UserSerializer()  # include full user info
+    latest_reading = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Detector
+        fields = ['id', 'name', 'location', 'sensor_on', 'user', 'latest_reading']
+
+    def get_latest_reading(self, obj):
+        latest = DetectorReading.objects.filter(detector=obj).first()
+        return DetectorReadingSerializer(latest).data if latest else None
+
+
 # ✅ NEW: FCM Token Serializer
 class FCMTokenSerializer(serializers.ModelSerializer):
     class Meta:

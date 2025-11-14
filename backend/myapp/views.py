@@ -15,7 +15,7 @@ from django.contrib.auth.hashers import check_password
 from .models import User, Detector, DetectorReading, FCMToken
 from .serializers import (
     UserSerializer, RegisterSerializer,
-    DetectorSerializer, DetectorReadingSerializer, FCMTokenSerializer
+    DetectorSerializer, DetectorReadingSerializer, AdminDetectorSerializer, FCMTokenSerializer
 )
 
 
@@ -169,16 +169,12 @@ class AdminUsersView(APIView):
 
 # 🔐 Admin Detectors (JWT protected)
 class AdminDetectorsView(APIView):
-    """
-    Returns a list of all detectors in the system.
-    JWT authentication required.
-    """
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         detectors = Detector.objects.select_related('user').all()
-        serializer = DetectorSerializer(detectors, many=True)
+        serializer = AdminDetectorSerializer(detectors, many=True) 
         return Response(serializer.data)
 
 
