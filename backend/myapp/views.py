@@ -228,8 +228,8 @@ class ESP32DataReceiveView(APIView):
             for token in tokens:
                 send_push_notification(
                     token,
-                    "🚨 Fire Alert",
-                    f"{detector.name} detected dangerous gas levels!"
+                    "🚨 Fire Risk Alert",
+                    f"{detector.name} at {detector.location} detected a hazardous level. Please check immediately!"
                 )
 
         return Response({"message": "Data received"}, status=201)
