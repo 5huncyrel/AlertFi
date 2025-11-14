@@ -5,9 +5,12 @@ from django.contrib.auth.password_validation import validate_password
 
 
 class UserSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(source='full_name', read_only=True)
+    registered = serializers.DateTimeField(source='date_joined', format="%Y-%m-%d", read_only=True)
+   
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'full_name','notifications_enabled', 'address')
+        fields = ('id', 'username', 'email', 'full_name', 'name', 'notifications_enabled', 'address', 'registered')
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -42,16 +45,16 @@ class DetectorReadingSerializer(serializers.ModelSerializer):
 
 
 class AdminDetectorSerializer(serializers.ModelSerializer):
-    user = UserSerializer()  # include full user info
-    latest_reading = serializers.SerializerMethodField()
+    user = serializers.IntegerField(source='user.id', read_only=True)
+    status = serializers.SerializerMethodField()
 
     class Meta:
         model = Detector
-        fields = ['id', 'name', 'location', 'sensor_on', 'user', 'latest_reading']
+        fields = ['id', 'name', 'location', 'sensor_on', 'user', 'status']
 
-    def get_latest_reading(self, obj):
-        latest = DetectorReading.objects.filter(detector=obj).first()
-        return DetectorReadingSerializer(latest).data if latest else None
+    def get_status(self, obj):
+        latest = obj.detectorreading_set.first()
+        return latest.status if latest else "Unknown"
 
 
 # ✅ NEW: FCM Token Serializer
