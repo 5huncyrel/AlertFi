@@ -28,6 +28,8 @@ class RegisterSerializer(serializers.ModelSerializer):
             full_name=validated_data.get('full_name', ''),
             address=validated_data.get('address', '')
         )
+        
+        user.generate_verification_token()
         return user
 
 
@@ -62,3 +64,21 @@ class FCMTokenSerializer(serializers.ModelSerializer):
     class Meta:
         model = FCMToken
         fields = ('token',)
+        
+
+
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        # Check user exists
+        try:
+            user = User.objects.get(username=attrs['username'])
+        except User.DoesNotExist:
+            raise serializers.ValidationError("No active account found with the given credentials")
+
+        # Check email verified
+        if not user.email_verified:
+            raise serializers.ValidationError("Email not verified. Please verify your email first.")
+
+        # Standard validation
+        data = super().validate(attrs)
+        return data

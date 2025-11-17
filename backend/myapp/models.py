@@ -7,6 +7,14 @@ class User(AbstractUser):
     notifications_enabled = models.BooleanField(default=True)
     full_name = models.CharField(max_length=255, blank=True, null=True)
     address = models.CharField(max_length=255, blank=True, null=True)
+    email_verified = models.BooleanField(default=False)
+    verification_token = models.CharField(max_length=255, blank=True, null=True)
+   
+    def generate_verification_token(self):
+        self.verification_token = str(uuid.uuid4())
+        self.save()
+        return self.verification_token
+
 
 
 class Detector(models.Model):
