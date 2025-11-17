@@ -1,5 +1,6 @@
 # myapp/serializers.py
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .models import User, Detector, DetectorReading, FCMToken
 from django.contrib.auth.password_validation import validate_password
 
