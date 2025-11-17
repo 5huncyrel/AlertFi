@@ -1,18 +1,12 @@
-# myapp/email_utils.py
 import requests
 import os
 
-# Make sure BREVO_API_KEY is set in Render environment variables
 BREVO_API_KEY = os.getenv("BREVO_API_KEY")
+BREVO_SENDER_EMAIL = "no-reply@alertfi.com"  # Must be verified in Brevo
 
-def send_email(to, subject, html_content):
-    """
-    Sends an email using Brevo SMTP API.
-    Safe for Render deployment.
-    """
+def send_email(to: str, subject: str, html_content: str):
     if not BREVO_API_KEY:
-        print("BREVO_API_KEY not set!")
-        return None
+        raise Exception("BREVO_API_KEY is not set in environment!")
 
     url = "https://api.brevo.com/v3/smtp/email"
     headers = {
@@ -22,17 +16,15 @@ def send_email(to, subject, html_content):
     }
 
     payload = {
-        "sender": {"name": "AlertFi", "email": "no-reply@alertfi.com"},
+        "sender": {"name": "AlertFi", "email": BREVO_SENDER_EMAIL},
         "to": [{"email": to}],
         "subject": subject,
         "htmlContent": html_content,
     }
 
-    try:
-        response = requests.post(url, json=payload, headers=headers)
-        response.raise_for_status()  # Raise exception for HTTP errors
-    except requests.exceptions.RequestException as e:
-        print("Email sending failed:", e)
-        return None
+    response = requests.post(url, json=payload, headers=headers)
+
+    if not response.ok:
+        raise Exception(f"Brevo email failed: {response.status_code} - {response.text}")
 
     return response

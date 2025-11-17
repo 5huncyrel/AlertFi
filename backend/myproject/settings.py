@@ -23,6 +23,8 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 import os
 import dj_database_url
 
+BREVO_API_KEY = os.getenv("BREVO_API_KEY")
+
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 if DATABASE_URL:
@@ -196,4 +198,3 @@ else:
 FIREBASE_SERVICE_ACCOUNT = FIREBASE_KEY_PATH
 
 
-BREVO_API_KEY = os.getenv("BREVO_API_KEY")
