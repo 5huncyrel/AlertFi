@@ -196,8 +196,4 @@ else:
 FIREBASE_SERVICE_ACCOUNT = FIREBASE_KEY_PATH
 
 
-
-
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-
 BREVO_API_KEY = os.getenv("BREVO_API_KEY")
