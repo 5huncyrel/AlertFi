@@ -29,37 +29,14 @@ class RegisterView(generics.CreateAPIView):
     def perform_create(self, serializer):
         user = serializer.save()
         try:
-            self.send_verification_email(user)
+            send_verification_email(user)
         except Exception as e:
             # Delete user if email fails
             user.delete()
-            raise Response(
+            return Response(
                 {"error": f"Registration failed: {str(e)}"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-
-    def send_verification_email(self, user: User):
-        """
-        Generates a verification token and sends an email via Brevo.
-        """
-        token = user.generate_verification_token()
-
-        html_content = f"""
-        <h2>Verify your AlertFi account</h2>
-        <p>Hello, {user.username}!</p>
-        <p>Your verification code is:</p>
-        <h1><strong>{token}</strong></h1>
-        <p>Enter this code in the AlertFi app to verify your account.</p>
-        <p>If you did not sign up, you can ignore this email.</p>
-        """
-
-        # Send email via Brevo
-        send_email(
-            to=user.email,
-            subject="🔒 AlertFi Email Verification",
-            html_content=html_content
-        )
-
 
 
 # 📩 Resend Verification Email
@@ -74,7 +51,7 @@ class ResendVerificationEmailView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
         try:
-            self.send_verification_email(user)
+            send_verification_email(user)
         except Exception as e:
             return Response(
                 {"error": f"Failed to send verification email: {str(e)}"},
@@ -83,27 +60,8 @@ class ResendVerificationEmailView(APIView):
 
         return Response({"message": "Verification email resent successfully."})
 
-    def send_verification_email(self, user: User):
-        token = user.generate_verification_token()
 
-        html_content = f"""
-        <h2>Verify your AlertFi account</h2>
-        <p>Hello, {user.username}!</p>
-        <p>Your verification code is:</p>
-        <h1><strong>{token}</strong></h1>
-        <p>Enter this code in the AlertFi app to verify your account.</p>
-        <p>If you did not sign up, you can ignore this email.</p>
-        """
-
-        send_email(
-            to=user.email,
-            subject="🔒 AlertFi Email Verification",
-            html_content=html_content
-        )
-
-
-
-# ✅ Verify Email
+# 🔐 Verify Email
 class VerifyEmailView(APIView):
     """
     Endpoint for Flutter app to verify a user's email using a token.
@@ -123,6 +81,24 @@ class VerifyEmailView(APIView):
         user.save()
 
         return Response({"message": "Email successfully verified!"})
+
+
+# ⚡ Helper function for sending verification emails
+def send_verification_email(user: User):
+    token = user.generate_verification_token()
+    html_content = f"""
+        <h2>Verify your AlertFi account</h2>
+        <p>Hello, {user.username}!</p>
+        <p>Your verification code is:</p>
+        <h1><strong>{token}</strong></h1>
+        <p>Enter this code in the AlertFi app to verify your account.</p>
+        <p>If you did not sign up, you can ignore this email.</p>
+    """
+    send_email(
+        to=user.email,
+        subject="🔒 AlertFi Email Verification",
+        html_content=html_content
+    )
 
 
 

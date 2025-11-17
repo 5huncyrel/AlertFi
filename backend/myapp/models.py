@@ -1,7 +1,7 @@
 # myapp/models.py
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-import uuid
+import random
 
 
 class User(AbstractUser):
@@ -12,9 +12,10 @@ class User(AbstractUser):
     verification_token = models.CharField(max_length=255, blank=True, null=True)
    
     def generate_verification_token(self):
-        self.verification_token = str(uuid.uuid4())
+        code = f"{random.randint(100000, 999999)}"
+        self.verification_token = code
         self.save()
-        return self.verification_token
+        return code
 
 
 
