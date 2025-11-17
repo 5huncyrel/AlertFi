@@ -2,7 +2,7 @@ import requests
 import os
 
 BREVO_API_KEY = os.getenv("BREVO_API_KEY")
-BREVO_SENDER_EMAIL = "no-reply@alertfi.com"  # Must be verified in Brevo
+BREVO_SENDER_EMAIL = "shuncyrel@gmail.com"  
 
 def send_email(to: str, subject: str, html_content: str):
     if not BREVO_API_KEY:
