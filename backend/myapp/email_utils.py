@@ -1,3 +1,4 @@
+# myapp/email_utils.py
 import requests
 import os
 
