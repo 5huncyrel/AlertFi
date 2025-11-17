@@ -1,7 +1,7 @@
 # myapp/urls.py
 from django.urls import path  
 from .views import (
-    RegisterView, UserDetailView, VerifyEmailView, UpdateEmailView, ChangePasswordView, 
+    RegisterView, UserDetailView, UpdateEmailView, ChangePasswordView, 
     AdminLoginView, AdminUsersView, AdminDetectorsView, AdminReadingsView,
     DetectorListView, DetectorDetailView, DetectorDataView, DetectorReadingsView, 
     DetectorReadingDetailView, ESP32DataReceiveView, ToggleSensorView, FCMTokenView,
@@ -11,10 +11,11 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
     path('register/', RegisterView.as_view()),
+    path("auth/resend-verification/", ResendVerificationEmailView.as_view()),
+    path("auth/verify-email/", VerifyEmailView.as_view()),
     path('token/', TokenObtainPairView.as_view()),
     path('token/refresh/', TokenRefreshView.as_view()),
     path('user/', UserDetailView.as_view()),
-    path('verify-email/', VerifyEmailView.as_view()),
     path('user/update-email/', UpdateEmailView.as_view()),
     path('user/change-password/', ChangePasswordView.as_view()),
     

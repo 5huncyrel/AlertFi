@@ -6,55 +6,94 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.views import TokenObtainPairView
-
-from django.core.mail import send_mail
-from django.conf import settings
+from .utils import send_email
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.contrib.auth import authenticate
 from django.contrib.auth.hashers import check_password
-
 from .notifications import send_push_notification
-
 
 from .models import User, Detector, DetectorReading, FCMToken
 from .serializers import (
-    UserSerializer, RegisterSerializer, DetectorSerializer, DetectorReadingSerializer, 
-    AdminDetectorSerializer, FCMTokenSerializer, MyTokenObtainPairSerializer
+    UserSerializer, RegisterSerializer,
+    DetectorSerializer, DetectorReadingSerializer, AdminDetectorSerializer, FCMTokenSerializer
 )
 
 
 
-# 🔐 User Registration
+# 🔐 User Registration with Auto Email Verification
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = RegisterSerializer
-    
+
     def perform_create(self, serializer):
         user = serializer.save()
-        token = user.verification_token
-        send_mail(
-            subject="🔒 AlertFi Email Verification",
-            message=f"Hello {user.username},\n\nUse this code to verify your email:\n{token}",
-            from_email=settings.EMAIL_HOST_USER,
-            recipient_list=[user.email],
-        )
-
-
-# ✅ Verify email endpoint
-class VerifyEmailView(APIView):
-    def post(self, request):
-        email = request.data.get("email")
-        token = request.data.get("token")
-        try:
-            user = User.objects.get(email=email, verification_token=token)
-            user.email_verified = True
-            user.verification_token = ""
-            user.save()
-            return Response({"message": "Email verified successfully"}, status=200)
-        except User.DoesNotExist:
-            return Response({"error": "Invalid email or token"}, status=400)
         
+        # Auto-send verification email
+        send_verification_email(user)
+
+
+# 📩 Resend Verification Email
+class ResendVerificationEmailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        if user.email_verified:
+            return Response(
+                {"message": "Email is already verified."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        send_verification_email(user)
+        return Response({"message": "Verification email resent."})
+
+
+# ⚡ Helper function to send verification email
+def send_verification_email(user: User):
+    # Generate a unique verification token
+    token = user.generate_verification_token()
+
+    # Email content for Flutter app
+    html_content = f"""
+        <h2>Verify your AlertFi account</h2>
+        <p>Hello, {user.username}!</p>
+        <p>Your verification code is:</p>
+        <h1><strong>{token}</strong></h1>
+        <p>Enter this code in the AlertFi app to verify your account.</p>
+        <p>If you did not sign up, you can ignore this email.</p>
+    """
+
+    # Send email via your send_email utility
+    send_email(
+        to=user.email,
+        subject="🔒 AlertFi Email Verification",
+        html_content=html_content
+    )
+
+
+# ✅ Verify Email Endpoint
+class VerifyEmailView(APIView):
+    """
+    Endpoint for Flutter app to verify user's email using token.
+    """
+    def post(self, request):
+        token = request.data.get("token")
+        if not token:
+            return Response({"error": "Token is required"}, status=400)
+
+        try:
+            user = User.objects.get(verification_token=token)
+        except User.DoesNotExist:
+            return Response({"error": "Invalid or expired token"}, status=400)
+
+        user.email_verified = True
+        user.verification_token = None
+        user.save()
+
+        return Response({"message": "Email successfully verified!"})
+
+
 
 # 👤 Authenticated User Info
 class UserDetailView(APIView):
@@ -74,11 +113,6 @@ class UpdateEmailView(APIView):
         request.user.save()
         return Response({'message': 'Email updated'})
 
-
-# 🔑 Custom login that blocks unverified users
-class MyTokenObtainPairView(TokenObtainPairView):
-    serializer_class = MyTokenObtainPairSerializer
-    
 
 # 🔒 Change Password
 class ChangePasswordView(APIView):
