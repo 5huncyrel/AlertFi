@@ -1,7 +1,7 @@
 # myapp/urls.py
 from django.urls import path  
 from .views import (
-    RegisterView, UserDetailView, UpdateEmailView, ChangePasswordView, 
+    RegisterView, UserDetailView, VerifyEmailView, UpdateEmailView, ChangePasswordView, 
     AdminLoginView, AdminUsersView, AdminDetectorsView, AdminReadingsView,
     DetectorListView, DetectorDetailView, DetectorDataView, DetectorReadingsView, 
     DetectorReadingDetailView, ESP32DataReceiveView, ToggleSensorView, FCMTokenView,
