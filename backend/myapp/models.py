@@ -28,16 +28,20 @@ class Detector(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.detector_code:
-            # Generate unique 6-digit code
-            while True:
+            # Try generating a unique 6-digit code up to 100 times
+            for _ in range(100):
                 code = f"{random.randint(100000, 999999)}"
                 if not Detector.objects.filter(detector_code=code).exists():
                     self.detector_code = code
                     break
+            else:
+                # If all attempts fail, raise an error
+                raise ValueError("Unable to generate a unique detector code. Too many detectors exist.")
         super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.name} ({self.location})"
+
 
 
 class DetectorReading(models.Model):
