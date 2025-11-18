@@ -276,17 +276,17 @@ class ESP32DataReceiveView(APIView):
     permission_classes = []  # No auth for ESP32
 
     def post(self, request):
-        detector_id = request.data.get("detector_id")
+        detector_code = request.data.get("detector_code")  # change to detector_code
         ppm = request.data.get("ppm")
         battery = request.data.get("battery", 100)
         status = request.data.get("status")
-        temperature = request.data.get("temperature")  # 🌡️ NEW
-        humidity = request.data.get("humidity")        # 💧 NEW
+        temperature = request.data.get("temperature")
+        humidity = request.data.get("humidity")
 
         try:
-            detector = Detector.objects.get(id=detector_id)
+            detector = Detector.objects.get(detector_code=detector_code)
         except Detector.DoesNotExist:
-            return Response({"error": "Invalid detector ID"}, status=400)
+            return Response({"error": "Invalid detector code"}, status=400)
 
         # Save the reading
         reading = DetectorReading.objects.create(
@@ -294,11 +294,11 @@ class ESP32DataReceiveView(APIView):
             ppm=ppm,
             battery=battery,
             status=status,
-            temperature=temperature,  # ✅ NEW
-            humidity=humidity         # ✅ NEW
+            temperature=temperature,
+            humidity=humidity
         )
 
-        # ✅ Push notification if danger
+        # Push notification if danger
         if status == "DANGER" and detector.user.notifications_enabled:
             tokens = FCMToken.objects.filter(user=detector.user).values_list('token', flat=True)
             for token in tokens:

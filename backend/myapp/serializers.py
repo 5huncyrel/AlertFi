@@ -34,8 +34,8 @@ class RegisterSerializer(serializers.ModelSerializer):
 class DetectorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Detector
-        fields = ['id', 'name', 'location', 'sensor_on'] 
-        read_only_fields = ['id', 'sensor_on']
+        fields = ['id', 'detector_code', 'name', 'location', 'sensor_on']
+        read_only_fields = ['id', 'sensor_on', 'detector_code']
 
 
 class DetectorReadingSerializer(serializers.ModelSerializer):
@@ -50,7 +50,7 @@ class AdminDetectorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Detector
-        fields = ['id', 'name', 'location', 'sensor_on', 'user', 'status']
+        fields = ['id', 'detector_code', 'name', 'location', 'sensor_on', 'user', 'status']
 
     def get_status(self, obj):
         latest = obj.detectorreading_set.first()

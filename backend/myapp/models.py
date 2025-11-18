@@ -24,6 +24,17 @@ class Detector(models.Model):
     name = models.CharField(max_length=50)
     location = models.CharField(max_length=100)
     sensor_on = models.BooleanField(default=True)
+    detector_code = models.CharField(max_length=6, unique=True, blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        if not self.detector_code:
+            # Generate unique 6-digit code
+            while True:
+                code = f"{random.randint(100000, 999999)}"
+                if not Detector.objects.filter(detector_code=code).exists():
+                    self.detector_code = code
+                    break
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.name} ({self.location})"
