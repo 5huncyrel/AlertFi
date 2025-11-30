@@ -21,7 +21,7 @@ from .serializers import (
 
 
 
-# 🔐 User Registration with Auto Email Verification
+# User Registration with Auto Email Verification
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = RegisterSerializer
@@ -39,7 +39,7 @@ class RegisterView(generics.CreateAPIView):
             )
 
 
-# 📩 Resend Verification Email
+# Resend Verification Email
 class ResendVerificationEmailView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -61,7 +61,7 @@ class ResendVerificationEmailView(APIView):
         return Response({"message": "Verification email resent successfully."})
 
 
-# 🔐 Verify Email
+# Verify Email
 class VerifyEmailView(APIView):
     """
     Endpoint for Flutter app to verify a user's email using a token.
@@ -83,7 +83,7 @@ class VerifyEmailView(APIView):
         return Response({"message": "Email successfully verified!"})
 
 
-# ⚡ Helper function for sending verification emails
+# Helper function for sending verification emails
 def send_verification_email(user: User):
     token = user.generate_verification_token()
     html_content = f"""
@@ -96,13 +96,13 @@ def send_verification_email(user: User):
     """
     send_email(
         to=user.email,
-        subject="🔒 AlertFi Email Verification",
+        subject="AlertFi Email Verification",
         html_content=html_content
     )
 
 
 
-# 👤 Authenticated User Info
+# Authenticated User Info
 class UserDetailView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -110,7 +110,7 @@ class UserDetailView(APIView):
         return Response(UserSerializer(request.user).data)
 
 
-# ✉️ Update Email
+# Update Email
 class UpdateEmailView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -121,7 +121,7 @@ class UpdateEmailView(APIView):
         return Response({'message': 'Email updated'})
 
 
-# 🔒 Change Password
+# Change Password
 class ChangePasswordView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -133,7 +133,7 @@ class ChangePasswordView(APIView):
 
 
 
-# 📟 List & Add Detectors for Logged-in User
+# List & Add Detectors for Logged-in User
 class DetectorListView(generics.ListCreateAPIView):
     serializer_class = DetectorSerializer
     permission_classes = [IsAuthenticated]
@@ -153,7 +153,7 @@ class DetectorDetailView(generics.RetrieveUpdateDestroyAPIView):
         return Detector.objects.filter(user=self.request.user)
 
 
-# 🏠 Home: Latest Detector Reading (SAFE, WARNING, DANGER)
+# Home: Latest Detector Reading (SAFE, WARNING, DANGER)
 class DetectorDataView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -171,9 +171,23 @@ class DetectorDataView(APIView):
         data['location'] = detector.location   
 
         return Response(data)
+    
+    
+class DetectorStatusView(APIView):
+    permission_classes = []  # No auth needed for ESP32
+
+    def get(self, request, detector_code):
+        try:
+            detector = Detector.objects.get(detector_code=detector_code)
+        except Detector.DoesNotExist:
+            return Response({'error': 'Detector not found'}, status=404)
+
+        return Response({
+            'sensor_on': detector.sensor_on
+        })
 
 
-# 📜 History: WARNING and DANGER Only
+# History: WARNING and DANGER Only
 class DetectorReadingsView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -197,7 +211,7 @@ class DetectorReadingDetailView(generics.DestroyAPIView):
 
 
 
-# 🌐 Website Admin Endpoints
+# Website Admin Endpoints
 @method_decorator(csrf_exempt, name='dispatch')
 class AdminLoginView(APIView):
     """
@@ -209,7 +223,7 @@ class AdminLoginView(APIView):
         password = request.data.get("password")
 
         try:
-            user = User.objects.get(email=email)  # ✅ get user by email
+            user = User.objects.get(email=email)  
         except User.DoesNotExist:
             return Response({"error": "Invalid credentials"}, status=401)
 
@@ -228,7 +242,7 @@ class AdminLoginView(APIView):
         }, status=status.HTTP_200_OK)
 
 
-# 🔐 Admin Users (JWT protected)
+# Admin Users (JWT protected)
 class AdminUsersView(APIView):
     """
     Returns a list of all registered users for the admin dashboard.
@@ -243,7 +257,7 @@ class AdminUsersView(APIView):
         return Response(serializer.data)
 
 
-# 🔐 Admin Detectors (JWT protected)
+# Admin Detectors (JWT protected)
 class AdminDetectorsView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -254,7 +268,7 @@ class AdminDetectorsView(APIView):
         return Response(serializer.data)
 
 
-# 🔐 Admin Readings (JWT protected)
+# Admin Readings (JWT protected)
 class AdminReadingsView(APIView):
     """
     Returns recent detector readings for all detectors.
@@ -271,7 +285,7 @@ class AdminReadingsView(APIView):
 
 
 
-# 📡 ESP32 Endpoint for Receiving Data
+# ESP32 Endpoint for Receiving Data
 class ESP32DataReceiveView(APIView):
     permission_classes = []  # No auth for ESP32
 
@@ -313,7 +327,7 @@ class ESP32DataReceiveView(APIView):
 
 
 
-# ✅ Toggle Sensor On/Off
+# Toggle Sensor On/Off
 class ToggleSensorView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -327,7 +341,7 @@ class ToggleSensorView(APIView):
             return Response({'error': 'Detector not found'}, status=404)
 
 
-# 🔐 Save FCM Token from Mobile App
+# Save FCM Token from Mobile App
 class FCMTokenView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -340,7 +354,7 @@ class FCMTokenView(APIView):
         return Response({'message': 'Token saved'})
     
     
-# ✅ Toggle Notifications On/Off
+# Toggle Notifications On/Off
 class ToggleNotificationsView(APIView):
     permission_classes = [IsAuthenticated]
 

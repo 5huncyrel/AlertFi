@@ -4,9 +4,9 @@ from .views import (
     RegisterView, ResendVerificationEmailView, VerifyEmailView, UserDetailView, 
     UpdateEmailView, ChangePasswordView, 
     AdminLoginView, AdminUsersView, AdminDetectorsView, AdminReadingsView,
-    DetectorListView, DetectorDetailView, DetectorDataView, DetectorReadingsView, 
-    DetectorReadingDetailView, ESP32DataReceiveView, ToggleSensorView, FCMTokenView,
-    ToggleNotificationsView
+    DetectorListView, DetectorDetailView, DetectorDataView, DetectorStatusView, 
+    DetectorReadingsView, DetectorReadingDetailView, ESP32DataReceiveView, 
+    ToggleSensorView, FCMTokenView, ToggleNotificationsView
 )
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
@@ -28,6 +28,7 @@ urlpatterns = [
     path('detectors/', DetectorListView.as_view()),
     path('detectors/<int:pk>/', DetectorDetailView.as_view()),
     path('detectors/<int:pk>/data/', DetectorDataView.as_view()),
+    path('detectors/status/<str:detector_code>/', DetectorStatusView.as_view()),
     path('detectors/<int:pk>/readings/', DetectorReadingsView.as_view()),
     path('readings/<int:pk>/', DetectorReadingDetailView.as_view()),
     
