@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "303754029707",
+    "project_id": "alertfi-67490",
+    "storage_bucket": "alertfi-67490.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:303754029707:android:2340aadd3efa224dec028e",
+        "android_client_info": {
+          "package_name": "com.example.alertfi_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBJevm_7dy5Zg09IQ7ZKuVcw3ra4XUdHhA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
