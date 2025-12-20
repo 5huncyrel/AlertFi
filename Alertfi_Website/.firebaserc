@@ -1,0 +1,16 @@
+{
+  "projects": {
+    "default": "alertfi-web-c0bec",
+    "alertfi": "alertfi-web-c0bec"
+  },
+  "targets": {
+    "alertfi-web-c0bec": {
+      "hosting": {
+        "default": [
+          "alertfi-web-c0bec"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}
